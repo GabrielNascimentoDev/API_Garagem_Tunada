@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Garagem Tunada</title>
+<style>
+:root{
+  --bg:#e7e8e4;--panel:#fbfbf9;--ink:#1b1e22;--mute:#5f666d;--line:#cfd1cc;
+  --blue:#12305c;--blue2:#2f6bd0;--danger:#a62b22;
+  --font:Bahnschrift,"DIN Alternate","Segoe UI",system-ui,sans-serif;
+}
+*{box-sizing:border-box}
+body{margin:0;font-family:var(--font);background:var(--bg);color:var(--ink);font-size:15px;display:grid;grid-template-columns:230px 1fr;min-height:100vh}
+button,input,select{font:inherit}
+:focus-visible{outline:2px solid var(--blue2);outline-offset:2px}
+
+aside{background:var(--blue);color:#fff;padding:28px 0 24px 22px}
+.brand{font-size:26px;font-weight:700;line-height:1;letter-spacing:-.01em;margin:0 22px 34px 0}
+.brand span{display:block;font-weight:400;opacity:.7}
+nav{display:flex;flex-direction:column;gap:2px}
+nav button{background:none;border:0;color:rgba(255,255,255,.78);text-align:left;padding:10px 16px;border-radius:6px 0 0 6px;cursor:pointer}
+nav button:hover{color:#fff;background:rgba(255,255,255,.08)}
+nav button.on{background:var(--bg);color:var(--blue);font-weight:700}
+nav button.sep{margin-top:18px;position:relative}
+nav button.sep::before{content:"";position:absolute;left:16px;right:22px;top:-10px;border-top:1px solid rgba(255,255,255,.22)}
+
+main{padding:34px 40px;max-width:1180px;width:100%}
+.head{display:flex;align-items:baseline;gap:14px;margin-bottom:20px}
+h2{margin:0;font-size:30px;letter-spacing:-.01em}
+#count{color:var(--mute)}
+.bar{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:14px}
+.bar .grow{flex:1;min-width:180px}
+input,select{width:100%;padding:9px 11px;border:1px solid #aeb2ac;border-radius:4px;background:#fff;color:var(--ink)}
+button.b{padding:9px 16px;border-radius:4px;border:1px solid var(--blue);background:var(--blue);color:#fff;cursor:pointer;font-weight:600}
+button.b:hover{background:#0d2547}
+button.b.ghost{background:transparent;color:var(--blue)}
+button.b.ghost:hover{background:rgba(18,48,92,.08)}
+button.b.plain{border-color:transparent;color:var(--mute);background:none;font-weight:400}
+button:disabled{opacity:.4;cursor:default}
+
+.panel{background:var(--panel);border:1px solid var(--line);border-radius:4px;overflow-x:auto}
+table{border-collapse:collapse;width:100%;min-width:860px}
+th{font-size:13px;font-weight:600;color:var(--mute);text-align:left;padding:12px 14px;border-bottom:2px solid var(--ink);white-space:nowrap}
+td{padding:14px;border-bottom:1px solid var(--line);vertical-align:middle}
+tbody tr:last-child td{border-bottom:0}
+tbody tr:hover{background:#f1f2ee}
+.id{color:var(--mute);font-variant-numeric:tabular-nums}
+.nm{font-weight:700}.sub{color:var(--mute);font-size:13px}
+.acts{text-align:right;white-space:nowrap}
+.acts button{background:none;border:0;padding:4px 8px;cursor:pointer;color:var(--blue);font-weight:600}
+.acts button:hover{text-decoration:underline}
+.acts .del{color:var(--mute)}.acts .del:hover{color:var(--danger)}
+.empty{padding:48px 20px;text-align:center;color:var(--mute)}
+.empty b{display:block;color:var(--ink);font-size:17px;margin-bottom:4px}
+
+.dyno{min-width:150px}
+.dyno b{font-variant-numeric:tabular-nums}
+.dyno .sub{margin-left:6px}
+.track{display:flex;height:6px;background:#dcdeda;border-radius:3px;overflow:hidden;margin-top:6px}
+.track i{display:block;height:100%}
+.track .o{background:var(--ink)}.track .g{background:var(--blue2)}
+.thumb{position:relative;width:96px;height:64px;flex:none;border-radius:3px;background:#d5d8d3;overflow:hidden;border:0;padding:0;cursor:zoom-in}
+.thumb img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.car{display:flex;align-items:center;gap:14px}
+#foto{width:min(820px,94vw)}#foto img{display:block;width:100%;max-height:80vh;object-fit:contain;background:#000}
+.more{color:var(--blue2);font-weight:600;margin-left:6px}
+.mods{max-width:230px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+
+.pager{display:flex;align-items:center;gap:12px;margin-top:14px;color:var(--mute)}
+
+dialog{border:1px solid var(--ink);border-radius:4px;padding:0;width:min(520px,94vw);background:var(--panel);color:var(--ink)}
+dialog::backdrop{background:rgba(18,30,48,.55)}
+dialog form{padding:24px}
+dialog h3{margin:0 0 16px;font-size:22px}
+#fields{display:grid;grid-template-columns:1fr 1fr;gap:12px 14px}
+#fields label{font-size:13px;color:var(--mute);display:flex;flex-direction:column;gap:5px}
+#fields label.w{grid-column:1/-1}
+#err{color:var(--danger);font-size:14px;white-space:pre-wrap;margin:12px 0 0}
+.foot{display:flex;gap:8px;justify-content:flex-end;margin-top:20px}
+
+#toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%);background:var(--ink);color:#fff;padding:12px 18px;border-radius:4px;max-width:90vw;white-space:pre-wrap;display:none}
+
+@media(max-width:820px){
+  body{grid-template-columns:1fr}
+  aside{padding:16px 0 0 14px}
+  .brand{margin:0 0 14px}.brand span{display:inline;margin-left:6px}
+  nav{flex-direction:row;overflow-x:auto}
+  nav button{border-radius:6px 6px 0 0;white-space:nowrap}
+  nav button.sep{margin:0}nav button.sep::before{display:none}
+  main{padding:22px 16px}
+}
+@media(prefers-reduced-motion:no-preference){.track i{transition:width .5s ease-out}}
+</style>
+</head>
+<body>
+<aside>
+  <p class="brand">Garagem<span>Tunada</span></p>
+  <nav id="tabs"></nav>
+</aside>
+<main>
+  <div class="head"><h2 id="title"></h2><span id="count"></span></div>
+  <div class="bar">
+    <input id="q" class="grow" aria-label="Buscar">
+    <button id="bBusca" class="b ghost">Buscar</button>
+    <button id="bLimpa" class="b plain">Limpar</button>
+    <button id="bNovo" class="b"></button>
+  </div>
+  <div class="panel"><table id="tbl"></table></div>
+  <div class="pager">
+    <button id="prev" class="b ghost">Anterior</button><span id="info"></span><button id="next" class="b ghost">Próxima</button>
+  </div>
+</main>
+<dialog id="dlg">
+  <form method="dialog" id="frm" onsubmit="return false">
+    <h3 id="dt"></h3><div id="fields"></div><p id="err"></p>
+    <div class="foot"><button type="button" id="bCancela" class="b ghost">Cancelar</button><button type="submit" id="bSalva" class="b">Salvar</button></div>
+  </form>
+</dialog>
+<dialog id="foto" onclick="this.close()"><img id="fotoImg" alt=""></dialog>
+<div id="toast" role="alert"></div>
+<script>
+const CAT = ['MOTOR','TURBO','SUSPENSAO','FREIOS','RODAS','ESCAPAMENTO','VISUAL','SOM','INTERIOR'];
+const TRACAO = ['DIANTEIRA','TRASEIRA','INTEGRAL'];
+const R = {
+  'carros':{t:'Carros',s:'modelo',n:'Novo carro',e:'Editar carro',f:[['modelo','Modelo','text'],['ano','Ano','number'],['cor','Cor','text'],['tracao','Tração','select',TRACAO],['potenciaOriginalCv','Potência original (cv)','number'],['fotoUrl','Foto (URL ou caminho, ex.: /img/supra-a80.jpg)','text'],['fabricante','Fabricante','ref','fabricantes'],['proprietario','Proprietário','ref','proprietarios'],['fichaTecnica','Ficha técnica','ref','fichas-tecnicas'],['modificacoes','Modificações (IDs, separados por vírgula)','refs']]},
+  'fabricantes':{t:'Fabricantes',s:'nome',n:'Novo fabricante',e:'Editar fabricante',f:[['nome','Nome','text'],['paisOrigem','País de origem','text']]},
+  'proprietarios':{t:'Proprietários',s:'nome',n:'Novo proprietário',e:'Editar proprietário',f:[['nome','Nome','text'],['apelido','Apelido','text'],['email','E-mail','text']]},
+  'fichas-tecnicas':{t:'Fichas técnicas',s:'potenciaCv',n:'Nova ficha técnica',e:'Editar ficha técnica',f:[['potenciaCv','Potência (cv)','number'],['torqueKgfm','Torque (kgfm)','number'],['zeroACemSegundos','0-100 km/h (s)','number'],['velocidadeMaximaKmh','Vel. máxima (km/h)','number']]},
+  'modificacoes':{t:'Modificações',s:'categoria',n:'Nova modificação',e:'Editar modificação',f:[['nome','Nome','text'],['categoria','Categoria','select',CAT],['precoReais','Preço (R$)','number'],['ganhoCv','Ganho (cv)','number']]}
+};
+let cur='carros', page=0, term='', editId=null, rows=[], totalPages=0, scale=600;
+const $ = id => document.getElementById(id);
+const esc = s => String(s ?? '').replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const label = o => o ? (o.nome || o.modelo || (o.potenciaCv ? o.potenciaCv + ' cv' : o.id)) : '';
+const list = d => Object.values(d._embedded || {})[0] || [];
+
+function toast(t){ const e=$('toast'); e.textContent=t; e.style.display='block'; clearTimeout(toast.t); toast.t=setTimeout(()=>e.style.display='none',4500); }
+
+/* colunas da tabela de carros (as demais telas usam colunas geradas dos campos) */
+const dyno = row => {
+  const o = row.potenciaOriginalCv, f = row.fichaTecnica && row.fichaTecnica.potenciaCv;
+  if (o == null && f == null) return '<span class="sub">sem dados</span>';
+  const top = f ?? o, base = Math.min(o ?? top, top);
+  return `<div class="dyno"><b>${top} cv</b>${o!=null&&f!=null?`<span class="sub">de fábrica ${o}</span>`:''}
+    <div class="track"><i class="o" style="width:${base/scale*100}%"></i><i class="g" style="width:${(top-base)/scale*100}%"></i></div></div>`;
+};
+const mods = row => {
+  const m = (row.modificacoes||[]).map(label);
+  if (!m.length) return '<span class="sub">nenhuma</span>';
+  return `<div class="mods" title="${esc(m.join(', '))}">${esc(m[0])}${m.length>1?`<span class="more">+${m.length-1}</span>`:''}</div>`;
+};
+R.carros.cols = [
+  ['Carro', r => `<div class="car">${r.fotoUrl?`<button class="thumb" title="Ampliar foto" onclick="zoom('${esc(r.fotoUrl)}','${esc(r.modelo)}')"><img src="${esc(r.fotoUrl)}" alt="${esc(r.modelo)}" onerror="this.remove()"></button>`:'<span class="thumb" style="cursor:default"></span>'}<div><div class="nm">${esc(r.modelo)}</div><div class="sub">${esc(label(r.fabricante))}${r.ano?', '+esc(r.ano):''}</div></div></div>`],
+  ['Cor', r => esc(r.cor)], ['Tração', r => esc(r.tracao)],
+  ['Potência', dyno], ['Proprietário', r => esc(label(r.proprietario))], ['Modificações', mods]
+];
+
+function zoom(u,m){ $('fotoImg').src=u; $('fotoImg').alt=m; $('foto').showModal(); }
+function colsOf(r){
+  return r.cols || r.f.map(f => [f[1].split(' (')[0], row => {
+    const v = row[f[0]];
+    if (f[2]==='ref') return esc(label(v));
+    if (f[2]==='refs') return esc((v||[]).map(label).join(', '));
+    return esc(v);
+  }]);
+}
+async function msg(res){
+  try { const d = await res.json(); return (d.mensagem || d.message || 'Erro') + (d.detalhes ? '\n' + Object.entries(d.detalhes).map(([k,v]) => k+': '+v).join('\n') : ''); }
+  catch(e){ return 'Erro ' + res.status; }
+}
+async function load(){
+  const r = R[cur], p = `page=${page}&size=5`;
+  const url = term ? `/api/${cur}/busca?${r.s}=${encodeURIComponent(term)}&${p}` : `/api/${cur}?${p}`;
+  let res;
+  try { res = await fetch(url); } catch(e){ toast('Não foi possível falar com a API. Confira se o servidor está rodando.'); return; }
+  if (!res.ok){ toast(await msg(res)); return; }
+  const d = await res.json();
+  rows = list(d);
+  totalPages = d.page ? d.page.totalPages : 0;
+  const total = d.page ? d.page.totalElements : rows.length;
+  scale = Math.max(600, ...rows.flatMap(x => [x.potenciaOriginalCv, x.fichaTecnica && x.fichaTecnica.potenciaCv]).filter(Boolean));
+  const cols = colsOf(r);
+  $('title').textContent = r.t;
+  $('count').textContent = term ? `${total} para “${term}”` : `${total} ${total===1?'registro':'registros'}`;
+  $('tbl').innerHTML = rows.length
+    ? '<thead><tr><th>ID</th>' + cols.map(c => `<th>${esc(c[0])}</th>`).join('') + '<th></th></tr></thead><tbody>' +
+      rows.map((row,i) => `<tr><td class="id">${row.id}</td>` + cols.map(c => `<td>${c[1](row)}</td>`).join('') +
+        `<td class="acts"><button onclick="openForm(${i})">Editar</button><button class="del" onclick="del(${row.id})">Excluir</button></td></tr>`).join('') + '</tbody>'
+    : `<tbody><tr><td class="empty"><b>${term ? 'Nada encontrado' : 'Nada cadastrado ainda'}</b>${term ? 'Tente outro termo ou limpe a busca.' : 'Use “' + esc(r.n) + '” para criar o primeiro.'}</td></tr></tbody>`;
+  $('info').textContent = `Página ${totalPages ? page+1 : 0} de ${totalPages}`;
+  $('prev').disabled = page <= 0; $('next').disabled = page + 1 >= totalPages;
+}
+function tabs(){
+  $('tabs').innerHTML = Object.keys(R).map((k,i) => `<button class="${k===cur?'on':''}${i===1?' sep':''}" onclick="go('${k}')">${R[k].t}</button>`).join('');
+  $('q').placeholder = 'Buscar por ' + R[cur].s;
+  $('bNovo').textContent = R[cur].n;
+}
+function go(k){ cur=k; page=0; term=''; $('q').value=''; tabs(); load(); }
+async function opts(res){
+  try { const r = await fetch(`/api/${res}?size=200`); return r.ok ? list(await r.json()) : null; } catch(e){ return null; }
+}
+async function openForm(i){
+  const row = i === undefined ? null : rows[i];
+  editId = row ? row.id : null;
+  const f = R[cur].f;
+  const refs = await Promise.all(f.map(x => x[2]==='ref' ? opts(x[3]) : null));
+  $('dt').textContent = row ? R[cur].e : R[cur].n;
+  $('err').textContent = '';
+  $('fields').innerHTML = f.map((x,k) => {
+    let v = row ? row[x[0]] : '';
+    if (x[2]==='ref') v = v ? v.id : '';
+    if (x[2]==='refs') v = (v||[]).map(m => m.id).join(',');
+    let input, wide = x[2]==='text' || x[2]==='refs' || x[2]==='ref';
+    if (x[2]==='select') input = `<select id="f_${x[0]}">${x[3].map(s => `<option ${s===v?'selected':''}>${s}</option>`).join('')}</select>`;
+    else if (x[2]==='ref' && refs[k]) input = `<select id="f_${x[0]}"><option value="">Nenhum</option>${refs[k].map(o => `<option value="${o.id}" ${o.id==v?'selected':''}>${esc(label(o))} (#${o.id})</option>`).join('')}</select>`;
+    else input = `<input id="f_${x[0]}" type="${x[2]==='number'?'number':'text'}" step="any" value="${esc(v)}">`;
+    return `<label class="${wide?'w':''}">${esc(x[1])}${input}</label>`;
+  }).join('');
+  $('dlg').showModal();
+}
+async function save(){
+  const body = {};
+  R[cur].f.forEach(([n,,t]) => {
+    const v = $('f_'+n).value.trim();
+    if (t==='number') body[n] = v==='' ? null : Number(v);
+    else if (t==='ref') body[n] = v ? {id:Number(v)} : null;
+    else if (t==='refs') body[n] = v.split(',').map(s => s.trim()).filter(Boolean).map(i => ({id:Number(i)}));
+    else body[n] = (n==='fotoUrl' && v==='') ? null : v;
+  });
+  const res = await fetch(`/api/${cur}` + (editId ? '/'+editId : ''), {
+    method: editId ? 'PUT' : 'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(body)
+  });
+  if (!res.ok){ $('err').textContent = await msg(res); return; }
+  $('dlg').close(); toast(editId ? 'Alterações salvas' : 'Cadastro criado'); load();
+}
+async function del(id){
+  if (!confirm('Excluir o registro #' + id + '? Essa ação não pode ser desfeita.')) return;
+  const res = await fetch(`/api/${cur}/${id}`, {method:'DELETE'});
+  if (!res.ok) toast(await msg(res)); else toast('Registro excluído');
+  if (rows.length === 1 && page > 0) page--;
+  load();
+}
+$('bNovo').onclick = () => openForm();
+$('frm').onsubmit = e => { e.preventDefault(); save(); };
+$('bCancela').onclick = () => $('dlg').close();
+$('bBusca').onclick = () => { term = $('q').value.trim(); page = 0; load(); };
+$('q').onkeydown = e => { if (e.key==='Enter') $('bBusca').click(); };
+$('bLimpa').onclick = () => { term = ''; $('q').value = ''; page = 0; load(); };
+$('prev').onclick = () => { page--; load(); };
+$('next').onclick = () => { page++; load(); };
+tabs(); load();
+</script>
+</body>
+</html>
