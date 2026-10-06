@@ -32,7 +32,7 @@ Recursos: `fabricantes`, `proprietarios`, `fichas-tecnicas`, `modificacoes`, `ca
 
 ## Ordem sugerida para criar dados novos
 Fabricante, Proprietario, FichaTecnica, Modificacao e por último Carro.
-Para relacionar, envie apenas o id, por exemplo `"fabricante": {"id": 1}`.
+Para relacionar, envie apenas o id, por exemplo fabricante": {"id": 1}.
 
 ## Postman
 Importe `postman/garagem-api.postman_collection.json`.
